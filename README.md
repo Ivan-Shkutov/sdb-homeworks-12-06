@@ -80,6 +80,15 @@
 
 ---
 
+![1](https://github.com/Ivan-Shkutov/sdb-homeworks-12-06/blob/main/1.png)
+
+![2](https://github.com/Ivan-Shkutov/sdb-homeworks-12-06/blob/main/2.png)
+
+![3](https://github.com/Ivan-Shkutov/sdb-homeworks-12-06/blob/main/3.png)
+
+![4](https://github.com/Ivan-Shkutov/sdb-homeworks-12-06/blob/main/4.png)
+
+![5](https://github.com/Ivan-Shkutov/sdb-homeworks-12-06/blob/main/5.png)
 
 
 ---
