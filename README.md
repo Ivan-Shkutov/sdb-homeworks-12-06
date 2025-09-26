@@ -182,9 +182,9 @@ docker compose exec slave mysql -uroot -prootpass -e "SELECT * FROM test_rep.t1;
 
 ### 10. Проверка логов на MASTER и SLAVE
 
-docker compose -f master
+docker compose logs -f master
 
-docker compose -f slave
+docker compose logs -f slave
 
  
 ![1](https://github.com/Ivan-Shkutov/sdb-homeworks-12-06/blob/main/1.png)
