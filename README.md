@@ -80,6 +80,107 @@
 
 ---
 
+### 1. Создадим каталог проекта
+
+mkdir -p ~/mysql-replication/{master,slave}
+
+cd ~/mysql-replication
+
+### 2. Создадим файл docker-compose.yml в дирректории mysql-replication
+
+### 3. Создадим файлы конфигурации для MASTER и SLAVE (master/my.cnf, slave/my.cnf)
+
+
+[mysqld]
+
+server-id=1
+
+log_bin=mysql-bin
+
+binlog_format=ROW
+
+gtid_mode=ON
+
+enforce_gtid_consistency=ON
+
+log_slave_updates=ON
+
+
+[mysqld]
+
+server-id=2
+
+log_bin=mysql-bin
+
+binlog_format=ROW
+
+gtid_mode=ON
+
+enforce_gtid_consistency=ON
+
+relay_log=mysqld-relay-bin
+
+read_only=ON
+
+log_slave_updates=ON
+
+
+### 4. Запускаем контейнеры
+
+docker compose up -d
+
+### 5. Создаем пользователя репликации на master
+
+docker compose exec master mysql -uroot -prootpass -e "
+
+> CREATE USER 'repl'@'%' IDENTIFIED BY 'replpass';
+
+> GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+
+> FLUSH PRIVILEGES;"
+
+### 6. Настраиваем SLAVE и подключаемся к MASTER
+
+docker compose exec slave mysql -uroot -prootpass -e "
+
+> STOP SLAVE;
+
+> CHANGE MASTER TO
+
+  MASTER_HOST='master',
+  
+  MASTER_USER='repl',
+  
+  MASTER_PASSWORD='replpass',
+  
+  MASTER_AUTO_POSITION=1;
+  
+> START SLAVE;"
+
+### 7. Проверяем статус репликации
+
+docker compose exec slave mysql -uroot -prootpass -e "SHOW SLAVE STATUS\G"
+
+docker compose exec master mysql -uroot -prootpass -e "SHOW MASTER STATUS\G"
+ 
+### 8. Добавляем данные на MASTER и реплицируем на SLAVE
+
+docker compose exec master mysql -uroot -prootpass -e "
+
+> CREATE DATABASE IF NOT EXISTS test_rep;
+
+> USE test_rep;
+
+> CREATE TABLE IF NOT EXISTS t1 (id INT AUTO_INCREMENT PRIMARY KEY, v VARCHAR(50));
+
+> INSERT INTO t1 (v) VALUES ('hello from master');"
+
+
+### 9. Проверка добавленные данных на SLAVE
+
+docker compose exec slave mysql -uroot -prootpass -e "SELECT * FROM test_rep.t1;"
+
+
 ![1](https://github.com/Ivan-Shkutov/sdb-homeworks-12-06/blob/main/1.png)
 
 ![2](https://github.com/Ivan-Shkutov/sdb-homeworks-12-06/blob/main/2.png)
